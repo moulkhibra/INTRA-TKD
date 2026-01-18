@@ -1,0 +1,169 @@
+// firestore.rules - Firebase Security Rules for INTRA-TKD
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ============================================
+    // Helper Functions
+    // ============================================
+    
+    // Check if user is authenticated
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    // Check if user is admin
+    function isAdmin() {
+      return isSignedIn() && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    // Check if user is coach
+    function isCoach() {
+      return isSignedIn() && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'coach';
+    }
+    
+    // Check if user is parent
+    function isParent() {
+      return isSignedIn() && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'parent';
+    }
+    
+    // Check if accessing own data
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+    
+    // ============================================
+    // Users Collection
+    // ============================================
+    match /users/{userId} {
+      // Anyone authenticated can read users
+      allow read: if isSignedIn();
+      
+      // Only admins can create/update/delete users
+      allow create, update, delete: if isAdmin();
+    }
+    
+    // ============================================
+    // Students Collection
+    // ============================================
+    match /students/{studentId} {
+      // Admins and coaches can read all students
+      allow read: if isAdmin() || isCoach();
+      
+      // Parents can only read their own children
+      allow read: if isParent() && 
+                    resource.data.parentId == request.auth.uid;
+      
+      // Only admins can create/update/delete students
+      allow create, update, delete: if isAdmin();
+    }
+    
+    // ============================================
+    // Parents Collection
+    // ============================================
+    match /parents/{parentId} {
+      // Admins can read all parents
+      allow read: if isAdmin();
+      
+      // Parents can read their own data
+      allow read: if isOwner(parentId);
+      
+      // Admins can create/update/delete parents
+      allow create, update, delete: if isAdmin();
+      
+      // Parents can update their own profile
+      allow update: if isOwner(parentId) && 
+                      !request.resource.data.diff(resource.data).affectedKeys()
+                        .hasAny(['role', 'accessLevel', 'children']);
+    }
+    
+    // ============================================
+    // Attendance Collection
+    // ============================================
+    match /attendance/{attendanceId} {
+      // Admins and coaches can read/write attendance
+      allow read, write: if isAdmin() || isCoach();
+      
+      // Parents can read attendance for their children only
+      allow read: if isParent() && 
+                    exists(/databases/$(database)/documents/students/$(resource.data.studentId)) &&
+                    get(/databases/$(database)/documents/students/$(resource.data.studentId)).data.parentId == request.auth.uid;
+    }
+    
+    // ============================================
+    // Payments Collection
+    // ============================================
+    match /payments/{paymentId} {
+      // Admins can read/write all payments
+      allow read, write: if isAdmin();
+      
+      // Coaches can read payments
+      allow read: if isCoach();
+      
+      // Parents can read payments for their children
+      allow read: if isParent() && 
+                    exists(/databases/$(database)/documents/students/$(resource.data.studentId)) &&
+                    get(/databases/$(database)/documents/students/$(resource.data.studentId)).data.parentId == request.auth.uid;
+    }
+    
+    // ============================================
+    // Graduations Collection
+    // ============================================
+    match /graduations/{graduationId} {
+      // Admins and coaches can read/write graduations
+      allow read, write: if isAdmin() || isCoach();
+      
+      // Parents can read graduations for their children
+      allow read: if isParent() && 
+                    exists(/databases/$(database)/documents/students/$(resource.data.studentId)) &&
+                    get(/databases/$(database)/documents/students/$(resource.data.studentId)).data.parentId == request.auth.uid;
+    }
+    
+    // ============================================
+    // Tournaments Collection
+    // ============================================
+    match /tournaments/{tournamentId} {
+      // Admins and coaches can read/write tournaments
+      allow read, write: if isAdmin() || isCoach();
+      
+      // Parents can read tournament results for their children
+      allow read: if isParent() && 
+                    exists(/databases/$(database)/documents/students/$(resource.data.studentId)) &&
+                    get(/databases/$(database)/documents/students/$(resource.data.studentId)).data.parentId == request.auth.uid;
+    }
+    
+    // ============================================
+    // Messages Collection
+    // ============================================
+    match /messages/{messageId} {
+      // Admins and coaches can read/write messages
+      allow read, write: if isAdmin() || isCoach();
+      
+      // Parents can read messages sent to their children
+      allow read: if isParent() && 
+                    exists(/databases/$(database)/documents/students/$(resource.data.studentId)) &&
+                    get(/databases/$(database)/documents/students/$(resource.data.studentId)).data.parentId == request.auth.uid;
+    }
+    
+    // ============================================
+    // Development Mode (REMOVE IN PRODUCTION!)
+    // ============================================
+    // Uncomment ONLY for development/testing
+    // match /{document=**} {
+    //   allow read, write: if true;
+    // }
+  }
+}
+
+// ============================================
+// IMPORTANT NOTES:
+// ============================================
+// 1. For development, you can temporarily allow all access by uncommenting the last rule
+// 2. In production, ALWAYS use proper authentication and authorization
+// 3. Test these rules thoroughly before deploying
+// 4. Consider adding rate limiting for sensitive operations
+// 5. Add data validation rules for better security

@@ -1,0 +1,68 @@
+{
+  "short_name": "TKD Manager",
+  "name": "TKD Manager - نظام إدارة نادي التايكواندو",
+  "description": "نظام متكامل لإدارة نادي التايكواندو",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "SMT.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any"
+    },
+    {
+      "src": "SMT.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any"
+    },
+    {
+      "src": "SMT.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "maskable"
+    }
+  ],
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#3b82f6",
+  "background_color": "#ffffff",
+  "screenshots": [
+    {
+      "src": "SMT.png",
+      "sizes": "540x720",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "categories": ["business", "productivity"],
+  "shortcuts": [
+    {
+      "name": "الحضور",
+      "short_name": "الحضور",
+      "description": "تسجيل حضور الطلاب",
+      "url": "/attendance",
+      "icons": [{ "src": "SMT.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "الطلاب",
+      "short_name": "الطلاب",
+      "description": "إدارة الطلاب",
+      "url": "/students",
+      "icons": [{ "src": "SMT.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "الدفعات",
+      "short_name": "الدفعات",
+      "description": "إدارة الدفعات",
+      "url": "/payments",
+      "icons": [{ "src": "SMT.png", "sizes": "96x96" }]
+    }
+  ]
+}

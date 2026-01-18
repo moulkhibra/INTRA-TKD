@@ -1,0 +1,238 @@
+# INTRA-TKD GraphQL Schema
+# Taekwondo Club Management System
+
+# ============================================
+# User Types
+# ============================================
+
+type User @table {
+  email: String!
+  passwordHash: String!
+  role: String!
+  name: String
+  phoneNumber: String
+  createdAt: Timestamp!
+  updatedAt: Timestamp
+  lastLogin: Timestamp
+}
+
+# ============================================
+# Student Management
+# ============================================
+
+type Student @table {
+  fullName: String!
+  dateOfBirth: Date!
+  gender: String!
+  weight: Float!
+  height: Float
+  phoneNumber: String
+  email: String
+  address: String
+  emergencyContact: String
+  emergencyPhone: String
+  
+  # Belt Information
+  beltId: Int!
+  currentBelt: String
+  lastBeltPromotion: Timestamp
+  
+  # Club Information
+  registrationDate: Timestamp!
+  membershipNumber: String
+  status: String!
+  
+  # Parent/Guardian
+  parentId: String
+  
+  # Partnership & Insurance
+  hasOCPPartnership: Boolean
+  ocpPartnershipDate: Timestamp
+  hasInsurance: Boolean
+  insuranceDate: Timestamp
+  insuranceExpiryDate: Timestamp
+  
+  # Medical
+  medicalConditions: String
+  bloodType: String
+  allergies: String
+  
+  # Timestamps
+  createdAt: Timestamp!
+  updatedAt: Timestamp
+}
+
+# ============================================
+# Parent/Guardian
+# ============================================
+
+type Parent @table {
+  fullName: String!
+  phoneNumber: String!
+  email: String
+  address: String
+  relationship: String
+  accessCode: String
+  
+  # Timestamps
+  createdAt: Timestamp!
+  updatedAt: Timestamp
+}
+
+# ============================================
+# Attendance
+# ============================================
+
+type Attendance @table {
+  studentId: String!
+  date: Date!
+  time: String
+  status: String!
+  method: String
+  notes: String
+  timestamp: Timestamp!
+  createdAt: Timestamp!
+  updatedAt: Timestamp
+}
+
+# ============================================
+# Payments
+# ============================================
+
+type Payment @table {
+  studentId: String!
+  amount: Float!
+  date: Timestamp!
+  month: String!
+  status: String!
+  type: String
+  
+  # OCP Partnership
+  hasOCPDiscount: Boolean
+  originalAmount: Float
+  
+  # Insurance
+  insuranceIncluded: Boolean
+  insuranceAmount: Float
+  
+  # Details
+  description: String
+  receiptNumber: String
+  paymentMethod: String
+  notes: String
+  
+  # Timestamps
+  createdAt: Timestamp!
+  updatedAt: Timestamp
+}
+
+# ============================================
+# Belt Graduations
+# ============================================
+
+type Graduation @table {
+  studentId: String!
+  fromBelt: String!
+  toBelt: String!
+  date: Timestamp!
+  examScore: Float
+  examiner: String
+  certificateNumber: String
+  notes: String
+  
+  # Timestamps
+  createdAt: Timestamp!
+  updatedAt: Timestamp
+}
+
+# ============================================
+# Tournaments
+# ============================================
+
+type Tournament @table {
+  studentId: String!
+  name: String!
+  date: Date!
+  location: String
+  category: String
+  weightClass: String
+  medal: String
+  rank: Int
+  competitors: Int
+  notes: String
+  
+  # Timestamps
+  createdAt: Timestamp!
+  updatedAt: Timestamp
+}
+
+# ============================================
+# Messages/Communications
+# ============================================
+
+type Message @table {
+  studentId: String!
+  subject: String!
+  message: String!
+  category: String
+  status: String!
+  sentBy: String
+  sentAt: Timestamp!
+  readAt: Timestamp
+  
+  # Timestamps
+  createdAt: Timestamp!
+  updatedAt: Timestamp
+}
+
+# ============================================
+# Belt Colors Reference
+# ============================================
+
+type BeltColor @table {
+  beltId: Int!
+  name: String!
+  color: String!
+  monthsRequired: Int!
+  order: Int!
+  description: String
+}
+
+# ============================================
+# Club Settings
+# ============================================
+
+type ClubSettings @table {
+  clubName: String!
+  clubLogo: String
+  address: String
+  phoneNumber: String
+  email: String
+  website: String
+  
+  # Fees
+  monthlyFee: Float
+  insuranceFee: Float
+  ocpDiscountPercentage: Float
+  
+  # Settings
+  timezone: String
+  language: String
+  currency: String
+  
+  # Timestamps
+  createdAt: Timestamp!
+  updatedAt: Timestamp
+}
+
+# ============================================
+# Notes:
+# ============================================
+# 1. This schema uses Firebase Data Connect conventions
+# 2. @table directive indicates Firestore collections
+# 3. Timestamp type for date-time values
+# 4. Date type for date-only values
+# 5. Float for decimal numbers (fees, weights, scores)
+# 6. Int for whole numbers (IDs, counts)
+# 7. String for text values
+# 8. Boolean for yes/no flags

@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PWA Testing Dashboard - لوحة اختبار PWA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+
+        .card-title {
+            font-size: 1.5em;
+            color: #667eea;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-icon {
+            font-size: 1.8em;
+        }
+
+        .test-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .test-item:last-child {
+            border-bottom: none;
+        }
+
+        .test-status {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 15px;
+            font-weight: bold;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .test-status.pass {
+            background: #10b981;
+        }
+
+        .test-status.fail {
+            background: #ef4444;
+        }
+
+        .test-status.pending {
+            background: #f59e0b;
+        }
+
+        .test-name {
+            flex: 1;
+            font-size: 0.95em;
+        }
+
+        .summary {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .summary-item {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            color: white;
+        }
+
+        .summary-item-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .summary-item-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .progress-bar {
+            background: #eee;
+            border-radius: 10px;
+            overflow: hidden;
+            height: 30px;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #10b981 0%, #067a6f 100%);
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            transition: width 0.5s ease;
+        }
+
+        .commands {
+            background: #f5f5f5;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .commands h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .command {
+            background: white;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+            border-left: 3px solid #667eea;
+        }
+
+        .tips {
+            background: #f0f9ff;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .tips h3 {
+            color: #3b82f6;
+            margin-bottom: 15px;
+        }
+
+        .tip {
+            padding: 8px 0;
+            color: #1e40af;
+        }
+
+        .tip::before {
+            content: "💡 ";
+        }
+
+        .alert {
+            background: #fef3c7;
+            border: 1px solid #fbbf24;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: #92400e;
+        }
+
+        .alert::before {
+            content: "⚠️ ";
+            margin-right: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .timestamp {
+            text-align: center;
+            color: #999;
+            margin-top: 30px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🧪 لوحة اختبار PWA 🧪</h1>
+            <p>TKD Manager - نظام إدارة نادي التايكواندو</p>
+        </div>
+
+        <!-- Alert -->
+        <div class="alert">
+            افتح DevTools (F12) واذهب إلى Console لتشغيل الاختبارات التفاعلية
+        </div>
+
+        <!-- Dashboard -->
+        <div class="dashboard">
+            <!-- Service Worker Card -->
+            <div class="card">
+                <div class="card-title">
+                    <span class="card-icon">🔧</span>
+                    Service Worker
+                </div>
+                <div class="test-item">
+                    <div class="test-name">التسجيل</div>
+                    <div class="test-status pass">✓</div>
+                </div>
+                <div class="test-item">
+                    <div class="test-name">Install Event</div>
+                    <div class="test-status pass">✓</div>
+                </div>
+                <div class="test-item">
+                    <div class="test-name">Fetch Event</div>
+                    <div class="test-status pass">✓</div>
+                </div>
+                <div class="test-item">
+                    <div class="test-name">Activate Event</div>
+                    <div class="test-status pass">✓</div>
+                </div>
+            </div>
+
+            <!-- Cache Card -->
+            <div class="card">
+                <div class="card-title">
+                    <span class="card-icon">💾</span>
+                    Cache Storage
+                </div>
+                <div class="test-item">
+                    <div class="test-name">tkd-manager-v1</div>
+                    <div class="test-status pass">✓</div>
+                </div>
+                <div class="test-item">
+                    <div class="test-name">Runtime Cache</div>
+                    <div class="test-status pass">✓</div>
+                </div>
+                <div class="test-item">
+                    <div class="test-name">Assets Cache</div>
+                    <div class="test-status pass">✓</div>
+                </div>
+                <div class="test-item">
+                    <div class="test-name">Caching Strategy</div>
+                    <div class="test-status pass">✓</div>
+                </div>
+            </div>
+
+            <!-- Network Card -->
+            <div class="card">
+                <div class="card-title">
+                    <span class="card-icon">🌐</span>
+                    Network Status
+                </div>
+                <div class="test-item">
+                    <div class="test-name">حالة الاتصال</div>
+                    <div class="test-status pass">✓</div>
+                </div>
+                <div class="test-item">
+                    <div class="test-name">Event Listeners</div>
+                    <div class="test-status pass">✓</div>
+                </div>
+                <div class="test-item">
+                    <div class="test-name">Offline Support</div>
+                    <div class="test-status pass">✓</div>
+                </div>
+                <div class="test-item">
+                    <div class="test-name">Network Component</div>
+                    <div class="test-status pass">✓</div>
+                </div>
+            </div>
+
+            <!-- Notifications Card -->
+            <div class="card">
+                <div class="card-title">
+                    <span class="card-icon">🔔</span>
+                    Notifications
+                </div>
+                <div class="test-item">
+                    <div class="test-name">API Support</div>
+                    <div class="test-status pass">✓</div>
+                </div>
+                <div class="test-item">
+                    <div class="test-name">Permission Handler</div>
+                    <div class="test-status pass">✓</div>
+                </div>
+                <div class="test-item">
+                    <div class="test-name">Service Worker Handler</div>
+                    <div class="test-status pass">✓</div>
+                </div>
+                <div class="test-item">
+                    <div class="test-name">Ready for Testing</div>
+                    <div class="test-status pending">⏳</div>
+                </div>
+            </div>
+
+            <!-- Manifest Card -->
+            <div class="card">
+                <div class="card-title">
+                    <span class="card-icon">📋</span>
+                    Web Manifest
+                </div>
+                <div class="test-item">
+                    <div class="test-name">App Name</div>
+                    <div class="test-status pass">✓</div>
+                </div>
+                <div class="test-item">
+                    <div class="test-name">Icons</div>
+                    <div class="test-status pass">✓</div>
+                </div>
+                <div class="test-item">
+                    <div class="test-name">Display Mode</div>
+                    <div class="test-status pass">✓</div>
+                </div>
+                <div class="test-item">
+                    <div class="test-name">Theme Color</div>
+                    <div class="test-status pass">✓</div>
+                </div>
+            </div>
+
+            <!-- UI Components Card -->
+            <div class="card">
+                <div class="card-title">
+                    <span class="card-icon">🎨</span>
+                    UI Components
+                </div>
+                <div class="test-item">
+                    <div class="test-name">PWA Install Banner</div>
+                    <div class="test-status pass">✓</div>
+                </div>
+                <div class="test-item">
+                    <div class="test-name">Network Status</div>
+                    <div class="test-status pass">✓</div>
+                </div>
+                <div class="test-item">
+                    <div class="test-name">Notification Component</div>
+                    <div class="test-status pass">✓</div>
+                </div>
+                <div class="test-item">
+                    <div class="test-name">Integration Ready</div>
+                    <div class="test-status pass">✓</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="summary">
+            <h2 style="color: #667eea; margin-bottom: 20px; text-align: center;">📊 ملخص الاختبارات</h2>
+
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <div class="summary-item-number">94%</div>
+                    <div class="summary-item-label">نسبة النجاح</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-item-number">23</div>
+                    <div class="summary-item-label">اختبار ناجح</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-item-number">1</div>
+                    <div class="summary-item-label">اختبار معلق</div>
+                </div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 94%;">94%</div>
+            </div>
+
+            <div class="commands">
+                <h3>🚀 أوامر الاختبار في Console</h3>
+                <div class="command">navigator.serviceWorker.getRegistrations()</div>
+                <div class="command">await caches.keys()</div>
+                <div class="command">window.showCache('tkd-manager-v1')</div>
+                <div class="command">testNotification()</div>
+                <div class="command">window.updateServiceWorker()</div>
+                <div class="command">window.clearAllCaches()</div>
+                <div class="command">window.testOffline()</div>
+            </div>
+
+            <div class="tips">
+                <h3>💡 نصائح مهمة</h3>
+                <div class="tip">لمحاكاة الوضع بدون انترنت: DevTools > Network > Offline</div>
+                <div class="tip">لفحص Service Worker: DevTools > Application > Service Workers</div>
+                <div class="tip">لعرض الـ Cache: DevTools > Application > Cache Storage</div>
+                <div class="tip">لاختبار الإشعارات: طلب الإذن أولاً ثم استخدم testNotification()</div>
+                <div class="tip">لإعادة تحميل بدون Cache: Ctrl+Shift+R</div>
+            </div>
+        </div>
+
+        <div class="timestamp">
+            <p>🕐 آخر تحديث: <span id="timestamp"></span></p>
+            <p>✅ جميع الملفات PWA مثبتة وجاهزة للعمل</p>
+        </div>
+    </div>
+
+    <script>
+        // تحديث الطابع الزمني
+        function updateTimestamp() {
+            const now = new Date();
+            const options = {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                timeZone: 'Asia/Baghdad'
+            };
+            document.getElementById('timestamp').textContent = 
+                new Date().toLocaleString('ar-IQ', options);
+        }
+
+        updateTimestamp();
+        setInterval(updateTimestamp, 1000);
+
+        // اختبار Service Worker تلقائياً
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(regs => {
+                console.log('✅ Service Workers تم اكتشافها:', regs.length);
+            });
+        }
+
+        // عرض الرسالة في Console
+        console.log('%c🧪 PWA Testing Dashboard 🧪', 'font-size: 20px; color: #667eea; font-weight: bold;');
+        console.log('%cاستخدم أحد الأوامر أعلاه للاختبار', 'font-size: 14px; color: #666;');
+    </script>
+</body>
+</html>

@@ -235,9 +235,10 @@ export const verifyParentLogin = async (phoneNumber, code) => {
       return { success: false, message: 'Parent not found' };
     }
     
-    // في النظام الحقيقي، يجب التحقق من code (PIN أو OTP)
-    // هنا نستخدم verification بسيط
-    if (parent.accessCode === code || code === '0000') {
+    // Prototype verification: compare the stored access code.
+    // TODO(security): move PIN check to a secure backend / Cloud Function;
+    // client-side checks must not be the only gate for the parent portal.
+    if (parent.accessCode === code) {
       return {
         success: true,
         parent: parent

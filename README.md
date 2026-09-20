@@ -2,6 +2,10 @@
 
 نظام متكامل لإدارة نادي التايكوندو يتيح إدارة الطلاب والدفعات والحضور والترقيات والبطولات والرسائل.
 
+> ⚠️ **Security status**: a prototype backdoor (`accessCode === '0000'`) in the parent-portal login was removed.
+> The PIN check is still client-side and must move to a secure backend (e.g., a Firebase Cloud Function) before production use.
+> Demo credentials (`admin@tkd.local / demo123`) are for local testing only — change or disable them everywhere except dev.
+
 ## ✨ الميزات الرئيسية
 
 ### 📚 إدارة الطلاب
